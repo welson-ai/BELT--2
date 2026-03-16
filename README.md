@@ -6,7 +6,7 @@
 ![Before Connect Wallet](public/imagey.png)
 
 ### After Wallet Connection - Multiple Wallet Options
-![Multiple Wallet Options](image.png)
+![Multiple Wallet Options](public/image.png)
 
 ---
 
