@@ -7,7 +7,7 @@ export class WalletNotFoundError extends Error {
 
 export class UserRejectedError extends Error {
   constructor() {
-    super("Transaction rejected. You cancelled the request.");
+    super("You rejected the transaction request.");
     this.type = "USER_REJECTED";
   }
 }
@@ -20,31 +20,16 @@ export class InsufficientBalanceError extends Error {
 }
 
 export const parseError = (e) => {
-  const msg = e?.message || JSON.stringify(e) || "";
+  const msg = (e?.message || JSON.stringify(e) || "").toLowerCase();
 
-  if (
-    msg.toLowerCase().includes("not found") ||
-    msg.toLowerCase().includes("not installed") ||
-    msg.toLowerCase().includes("undefined")
-  ) {
+  if (msg.includes("not found") || msg.includes("not installed") || msg.includes("undefined"))
     return new WalletNotFoundError();
-  }
 
-  if (
-    msg.toLowerCase().includes("reject") ||
-    msg.toLowerCase().includes("cancel") ||
-    msg.toLowerCase().includes("denied")
-  ) {
+  if (msg.includes("reject") || msg.includes("cancel") || msg.includes("denied"))
     return new UserRejectedError();
-  }
 
-  if (
-    msg.toLowerCase().includes("balance") ||
-    msg.toLowerCase().includes("insufficient") ||
-    msg.toLowerCase().includes("underfunded")
-  ) {
+  if (msg.includes("balance") || msg.includes("insufficient") || msg.includes("underfunded"))
     return new InsufficientBalanceError();
-  }
 
   return e;
 };

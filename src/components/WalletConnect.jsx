@@ -1,23 +1,22 @@
-const WalletConnect = ({ publicKey, connect, disconnect, error }) => {
-  return (
-    <div className="wallet-section">
-      {!publicKey ? (
-        <button onClick={connect} className="btn connect">
-          Connect Wallet
+const WalletConnect = ({ publicKey, connect, disconnect, error }) => (
+  <div className="card">
+    <h2>🔐 Wallet</h2>
+    {!publicKey ? (
+      <button className="btn primary" onClick={connect}>
+        Connect Wallet
+      </button>
+    ) : (
+      <div>
+        <p className="address">
+          ✅ {publicKey.slice(0, 8)}...{publicKey.slice(-8)}
+        </p>
+        <button className="btn danger" onClick={disconnect}>
+          Disconnect
         </button>
-      ) : (
-        <div>
-          <p className="address">
-            {publicKey.slice(0, 6)}...{publicKey.slice(-6)}
-          </p>
-          <button onClick={disconnect} className="btn disconnect">
-            Disconnect
-          </button>
-        </div>
-      )}
-      {error && <p className="error">{error}</p>}
-    </div>
-  );
-};
+      </div>
+    )}
+    {error && <p className="error-msg">⚠️ {error}</p>}
+  </div>
+);
 
 export default WalletConnect;

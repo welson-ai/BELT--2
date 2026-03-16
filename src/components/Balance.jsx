@@ -10,14 +10,14 @@ const Balance = ({ publicKey }) => {
     setLoading(true);
     fetchBalance(publicKey)
       .then(setBalance)
-      .catch(() => setBalance("Error fetching"))
+      .catch(() => setBalance("Error"))
       .finally(() => setLoading(false));
   }, [publicKey]);
 
   return (
-    <div className="balance-section">
-      <h3>XLM Balance</h3>
-      {loading ? <p>Loading...</p> : <p className="balance">{balance} XLM</p>}
+    <div className="card">
+      <h2>💰 XLM Balance</h2>
+      {loading ? <p>Loading...</p> : <p className="balance-amount">{balance} XLM</p>}
     </div>
   );
 };

@@ -1,64 +1,48 @@
 import { useState } from "react";
 import { sendXLM } from "../utils/stellar";
+import { parseError } from "../utils/errors";
+
+const STATUS = { IDLE: "idle", PENDING: "pending", SUCCESS: "success", ERROR: "error" };
 
 const SendPayment = ({ publicKey, signTransaction }) => {
   const [destination, setDestination] = useState("");
   const [amount, setAmount] = useState("");
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState(STATUS.IDLE);
   const [txHash, setTxHash] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSend = async () => {
     if (!destination || !amount) return;
-    setLoading(true);
-    setStatus(null);
-    setTxHash("");
-
+    setStatus(STATUS.PENDING);
+    setErrorMsg("");
     try {
       const hash = await sendXLM(publicKey, destination, amount, signTransaction);
       setTxHash(hash);
-      setStatus("success");
+      setStatus(STATUS.SUCCESS);
     } catch (e) {
-      setStatus("error");
-    } finally {
-      setLoading(false);
+      setErrorMsg(parseError(e).message);
+      setStatus(STATUS.ERROR);
     }
   };
 
   return (
-    <div className="send-section">
-      <h3>Send XLM</h3>
-      <input
-        placeholder="Destination Address"
-        value={destination}
-        onChange={(e) => setDestination(e.target.value)}
-      />
-      <input
-        placeholder="Amount (XLM)"
-        type="number"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-      />
-      <button onClick={handleSend} disabled={loading} className="btn send">
-        {loading ? "Sending..." : "Send XLM"}
+    <div className="card">
+      <h2>📤 Send XLM</h2>
+      <input placeholder="Destination Address" value={destination} onChange={(e) => setDestination(e.target.value)} />
+      <input placeholder="Amount (XLM)" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+      <button className="btn success" onClick={handleSend} disabled={status === STATUS.PENDING}>
+        {status === STATUS.PENDING ? "Sending..." : "Send XLM"}
       </button>
-
-      {status === "success" && (
-        <div className="feedback success">
-          Transaction Successful!
-          <br />
-          <a
-            href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View on Explorer: {txHash.slice(0, 16)}...
+      {status === STATUS.PENDING && <div className="status pending">⏳ Transaction pending...</div>}
+      {status === STATUS.SUCCESS && (
+        <div className="status success">
+          ✅ Sent!{" "}
+          <a href={`https://stellar.expert/explorer/testnet/tx/${txHash}`} target="_blank" rel="noreferrer">
+            View ↗
           </a>
         </div>
       )}
-      {status === "error" && (
-        <div className="feedback error">Transaction Failed. Check the address and balance.</div>
-      )}
+      {status === STATUS.ERROR && <div className="status error">❌ {errorMsg}</div>}
     </div>
   );
 };
